@@ -85,6 +85,7 @@ plt.colorbar()
 plt.title("PCA Projection colored by class4")
 plt.show()
 
-
+print("Explained variance ratio:", pca.explained_variance_ratio_)
+print("Total explained variance:", pca.explained_variance_ratio_.sum())
 
 
