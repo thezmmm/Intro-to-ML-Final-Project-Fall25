@@ -8,8 +8,7 @@ def preprocess_data(input_file, output_file="./data/processed_data.csv"):
     process raw data and save it as processed data.csv
 
     process：
-    - delete id and date
-    - partlybad -> 0/1
+    - delete id, date and partlybad
     - class4 encode（4 class）
     - Median replaces missing values
     - standardization
@@ -20,12 +19,12 @@ def preprocess_data(input_file, output_file="./data/processed_data.csv"):
     df = pd.read_csv(input_file)
 
     # delete columns
-    drop_cols = [col for col in ["id", "date"] if col in df.columns]
+    drop_cols = [col for col in ["id", "date","partlybad"] if col in df.columns]
     df = df.drop(columns=drop_cols)
 
-    # partlybad to int
-    if "partlybad" in df.columns:
-        df["partlybad"] = df["partlybad"].astype(int)
+    # # partlybad to int
+    # if "partlybad" in df.columns:
+    #     df["partlybad"] = df["partlybad"].astype(int)
 
     # Determine if it is a training set
     is_train = "class4" in df.columns
