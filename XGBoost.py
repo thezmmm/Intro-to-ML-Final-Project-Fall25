@@ -3,6 +3,7 @@ import os
 import joblib
 import pandas as pd
 import numpy as np
+from lightgbm import LGBMClassifier
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
@@ -12,7 +13,8 @@ from preprocess import preprocess_data, save_objects
 
 MODEL_DIR = "./models"
 
-def train_four_class(X_train, X_test, y_train, y_test):
+def train_four_class(X_train, X_test, y_train, y_test,sample_weight=None):
+
     # initialize XGBoost multi-classifier
     clf = xgb.XGBClassifier(
         objective='multi:softprob',  # output percentage
@@ -28,7 +30,7 @@ def train_four_class(X_train, X_test, y_train, y_test):
     )
 
     # train
-    clf.fit(X_train, y_train)
+    clf.fit(X_train, y_train,sample_weight=sample_weight)
 
     # predict
     y_pred = clf.predict(X_test)
@@ -43,14 +45,11 @@ def train_four_class(X_train, X_test, y_train, y_test):
 
 def train_two_class(X_train, X_test, y_train, y_test):
 
-
-    clf = xgb.XGBClassifier(
-        objective='binary:logistic',
-        eval_metric='logloss',
+    clf = LGBMClassifier(
         n_estimators=400,
         max_depth=6,
-        learning_rate=0.06,
-        subsample=0.9,
+        learning_rate=0.05,
+        subsample=0.8,
         colsample_bytree=0.8,
         random_state=42
     )
@@ -75,11 +74,14 @@ if __name__ == "__main__":
     # spilt feature and label
     X = df.drop("class4", axis=1)
     y = df["class4"]
+    y_orig = le.inverse_transform(y)
+    weights = {"Ia": 0.057778, "Ib": 0.182222, "II": 0.26, "nonevent": 0.5}
+    sample_weight = pd.Series(y_orig).map(weights)
     # split train and test set
     # X_train, X_test, y_train, y_test = train_test_split(
     #     X, y, test_size=0.05, random_state=42, stratify=y
     # )
-    clf_4 = train_four_class(X, X, y, y)
+    clf_4 = train_four_class(X, X, y, y,sample_weight)
     os.makedirs(MODEL_DIR, exist_ok=True)
     joblib.dump(clf_4, os.path.join(MODEL_DIR, "model_4class.pkl"))
 
