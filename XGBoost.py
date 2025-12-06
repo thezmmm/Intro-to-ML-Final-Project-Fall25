@@ -10,7 +10,7 @@ def train_four_class(X_train, X_test, y_train, y_test):
     # initialize XGBoost multi-classifier
     clf = xgb.XGBClassifier(
         objective='multi:softprob',  # output percentage
-        num_class=len(np.unique(y)),
+        num_class=len(np.unique(y_train)),
         eval_metric='mlogloss',
         use_label_encoder=False,
         n_estimators=200,
