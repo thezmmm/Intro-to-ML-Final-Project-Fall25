@@ -22,6 +22,8 @@ pred_labels = le.inverse_transform(pred_idx)
 
 # 2 class predict (According to the scoring rules, p is the possibility of the binary classification task)
 p_event = clf_2.predict_proba(X_test)[:, 1]
+# Fine-tuning p
+p_event = np.clip(p_event * 1.03, 0, 1)
 
 # build submission
 submission = pd.DataFrame({
