@@ -33,9 +33,10 @@ print("=== check std value ===")
 print(df[std_cols].describe().T)
 
 # Correlation Heatmap of MEAN features
-plt.figure(figsize=(18, 16))
+plt.figure(figsize=(16, 13))
 sns.heatmap(df[mean_cols].corr(), cmap="coolwarm", center=0)
 plt.title("Correlation Heatmap of MEAN features")
+plt.tight_layout() 
 
 # Relationship between features and class4
 X = df[mean_cols + std_cols]
