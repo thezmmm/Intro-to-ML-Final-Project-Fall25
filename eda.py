@@ -18,7 +18,8 @@ print("=== check duplicate value ===")
 print(df.duplicated().sum())
 
 # check the distribution of class4
-df['class4'].value_counts(normalize=True)
+print("=== check the distribution of class4 ===")
+print(df['class4'].value_counts(normalize=True))
 df['class4'].value_counts().plot(kind='bar')
 
 # hist for all param

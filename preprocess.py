@@ -1,7 +1,11 @@
+import os
+
+import joblib
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.impute import SimpleImputer
 
+MODEL_DIR = "./models"
 
 def preprocess_data(input_file, output_file="./data/processed_data.csv"):
     """
@@ -59,7 +63,19 @@ def preprocess_data(input_file, output_file="./data/processed_data.csv"):
     print(f"process done, saved to {output_file}")
 
     # return df_processed
-    return df_processed,label_encoder
+    return df_processed,label_encoder,imputer,scaler
+
+def save_objects(label_encoder, imputer, scaler):
+    os.makedirs(MODEL_DIR, exist_ok=True)
+    joblib.dump(label_encoder, os.path.join(MODEL_DIR, "label_encoder.pkl"))
+    joblib.dump(imputer, os.path.join(MODEL_DIR, "imputer.pkl"))
+    joblib.dump(scaler, os.path.join(MODEL_DIR, "scaler.pkl"))
+
+def load_objects():
+    label_encoder = joblib.load(os.path.join(MODEL_DIR, "label_encoder.pkl"))
+    imputer = joblib.load(os.path.join(MODEL_DIR, "imputer.pkl"))
+    scaler = joblib.load(os.path.join(MODEL_DIR, "scaler.pkl"))
+    return label_encoder, imputer, scaler
 
 if __name__ == "__main__":
     df_train_processed = preprocess_data("./data/train.csv", "./data/processed_train.csv")
