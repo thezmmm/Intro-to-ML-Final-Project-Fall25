@@ -1,12 +1,17 @@
+import os
+
+import joblib
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.linear_model import LogisticRegression
-from preprocess import preprocess_data
+from preprocess import preprocess_data,save_objects
 
-def train_four_class(X_train, X_test, y_train, y_test):
+MODEL_DIR = "./models"
+
+def train_four_class(X_train, X_test, y_train, y_test,sample_weight=None):
     # initialize XGBoost multi-classifier
     clf = LogisticRegression(
         solver='lbfgs',     
@@ -15,7 +20,7 @@ def train_four_class(X_train, X_test, y_train, y_test):
     )
 
     # train
-    clf.fit(X_train, y_train)
+    clf.fit(X_train, y_train, sample_weight=sample_weight)
 
     # predict
     y_pred = clf.predict(X_test)
@@ -50,16 +55,19 @@ def train_two_class(X_train, X_test, y_train, y_test):
     return clf
 
 if __name__ == "__main__":
-    df, le = preprocess_data("./data/train.csv")
+    df, le, imputer,scaler = preprocess_data("./data/train.csv")
+    save_objects(le, imputer, scaler)
     # 4 class
     # spilt feature and label
     X = df.drop("class4", axis=1)
     y = df["class4"]
+    y_orig=le.inverse_transform(y)
     # split train and test set
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.05, random_state=42, stratify=y
-    )
-    clf_4 = train_four_class(X_train, X_test, y_train, y_test)
+    weights = {"Ia": 0.057778, "Ib": 0.182222, "II": 0.26, "nonevent": 0.5}
+    sample_weight = pd.Series(y_orig).map(weights)
+    clf_4 = train_four_class(X,X,y,y, sample_weight)
+    os.makedirs(MODEL_DIR, exist_ok=True)
+    joblib.dump(clf_4, os.path.join(MODEL_DIR, "model_4class.pkl"))
 
     # 2 class
     y_orig = le.inverse_transform(df['class4'])
@@ -68,4 +76,6 @@ if __name__ == "__main__":
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.05, random_state=42, stratify=y
     )
-    clf_2 = train_two_class(X_train, X_test, y_train, y_test)
+    clf_2 = train_two_class(X,X,y,y)
+    os.makedirs(MODEL_DIR, exist_ok=True)
+    joblib.dump(clf_4, os.path.join(MODEL_DIR, "model_2class.pkl"))
