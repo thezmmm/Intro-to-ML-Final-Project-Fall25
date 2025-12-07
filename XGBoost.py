@@ -21,11 +21,11 @@ def train_four_class(X_train, X_test, y_train, y_test,sample_weight=None):
         num_class=len(np.unique(y_train)),
         eval_metric='mlogloss',
         use_label_encoder=False,
-        n_estimators=400,
-        max_depth=6,
-        learning_rate=0.06,
-        subsample=0.9,
-        colsample_bytree=0.8,
+        n_estimators=862,
+        max_depth=5,
+        learning_rate=0.278263374982772,
+        subsample=0.9698399125549624,
+        colsample_bytree=0.5260381503249651,
         random_state=42
     )
 
@@ -75,7 +75,7 @@ if __name__ == "__main__":
     X = df.drop("class4", axis=1)
     y = df["class4"]
     y_orig = le.inverse_transform(y)
-    weights = {"Ia": 0.057778, "Ib": 0.182222, "II": 0.26, "nonevent": 0.5}
+    weights = {"Ia": 1/0.057778, "Ib": 1/0.182222, "II": 1/0.26, "nonevent": 1/0.5}
     sample_weight = pd.Series(y_orig).map(weights)
     # split train and test set
     # X_train, X_test, y_train, y_test = train_test_split(
